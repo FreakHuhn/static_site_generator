@@ -2,6 +2,7 @@ from platform import node
 import unittest
 
 from textnode import *
+from functions import split_nodes_delimiter
 
 
 class TestTextNode(unittest.TestCase):
@@ -37,7 +38,29 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(html_node.value, "This is an italic text node")
     
         
-
+    def test_split_nodes_delimiter(self):
+        old_nodes = [TextNode("This is some **bold** text", TextType.TEXT)]
+        new_nodes = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+        expected_nodes = [
+            TextNode("This is some ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" text", TextType.TEXT)
+        ]
+        self.assertEqual(new_nodes, expected_nodes)
+    
+    def test_split_nodes_delimiter_no_delimiter(self):
+        old_nodes = [TextNode("This is some text without delimiter", TextType.TEXT)]
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+    
+    def test_split_nodes_delimiter2(self):
+        old_nodes = [TextNode("Was zur Hölle ist eigentlich _italic_? Kursiv oder was)", TextType.TEXT)]
+        new_nodes = split_nodes_delimiter(old_nodes, "_", TextType.ITALIC)
+        expected_nodes = [
+            TextNode("Was zur Hölle ist eigentlich ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode("? Kursiv oder was)", TextType.TEXT)
+        ]
 
 if __name__ == "__main__":
     unittest.main()
