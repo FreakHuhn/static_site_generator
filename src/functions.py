@@ -26,3 +26,10 @@ def extract_markdown_images(text):
         images.append(TextNode(alt_text, TextType.IMAGE, url))
     return images
 
+def extract_markdown_links(text):
+    pattern = r"\[([^\]]+)\]\(([^)]+)\)"
+    matches = re.findall(pattern, text)
+    links = []
+    for anchor_text, url in matches:
+        links.append(TextNode(anchor_text, TextType.LINK, url))
+    return links    
