@@ -86,7 +86,6 @@ def split_nodes_link(old_nodes):
             new_nodes.append(TextNode(text, TextType.TEXT))
     return new_nodes
 
-
 def text_to_textnodes(text):
     nodes = [TextNode(text, TextType.TEXT)]
     nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
@@ -95,3 +94,21 @@ def text_to_textnodes(text):
     nodes = split_nodes_link(nodes)
     nodes = split_nodes_image(nodes)
     return nodes
+
+def markdown_to_blocks(markdown):
+    blocks = markdown.split("\n\n")
+    blocks = [block.strip() for block in blocks if block.strip()]
+    return blocks
+
+def block_to_block_type(block):
+    if re.findall(r"^#{1,6} ", block):
+        return BlockType.HEADING
+    if re.findall(r"^> ", block):
+        return BlockType.QUOTE
+    if re.findall(r"^(\*|-|\+) ", block):
+        return BlockType.UNORDERED_LIST
+    if re.findall(r"^\d+\. ", block):
+        return BlockType.ORDERED_LIST
+    if re.findall(r"^```", block):
+        return BlockType.CODE
+    return BlockType.PARAGRAPH
