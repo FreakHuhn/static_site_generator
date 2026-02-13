@@ -2,7 +2,7 @@ from platform import node
 import unittest
 
 from textnode import *
-from functions import split_nodes_delimiter
+from functions import *
 
 
 class TestTextNode(unittest.TestCase):
@@ -61,6 +61,7 @@ class TestTextNode(unittest.TestCase):
             TextNode("italic", TextType.ITALIC),
             TextNode("? Kursiv oder was)", TextType.TEXT)
         ]
+    
 
 if __name__ == "__main__":
     unittest.main()

@@ -17,13 +17,13 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             else:
                 new_nodes.append(TextNode(part, text_type))
     return new_nodes
-
+#should return a list of tuples with the alt text and url of the images in the markdown text
 def extract_markdown_images(text):
-    pattern = r"!\[([^\]]*)\]\(([^)]+)\)"
+    pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
     matches = re.findall(pattern, text)
     images = []
     for alt_text, url in matches:
-        images.append(TextNode(alt_text, TextType.IMAGE, url))
+        images.append((alt_text, url))
     return images
 
 def extract_markdown_links(text):
@@ -31,5 +31,5 @@ def extract_markdown_links(text):
     matches = re.findall(pattern, text)
     links = []
     for anchor_text, url in matches:
-        links.append(TextNode(anchor_text, TextType.LINK, url))
-    return links    
+        links.append((anchor_text, url))
+    return links
