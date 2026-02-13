@@ -27,7 +27,7 @@ def extract_markdown_images(text):
     return images
 
 def extract_markdown_links(text):
-    pattern = r"\[([^\]]+)\]\(([^)]+)\)"
+    pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
     matches = re.findall(pattern, text)
     links = []
     for anchor_text, url in matches:
