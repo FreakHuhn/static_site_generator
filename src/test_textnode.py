@@ -50,8 +50,8 @@ class TestTextNode(unittest.TestCase):
     
     def test_split_nodes_delimiter_no_delimiter(self):
         old_nodes = [TextNode("This is some text without delimiter", TextType.TEXT)]
-        with self.assertRaises(ValueError):
-            split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+        new_nodes = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+        self.assertEqual(new_nodes, old_nodes)
     
     def test_split_nodes_delimiter2(self):
         old_nodes = [TextNode("Was zur Hölle ist eigentlich _italic_? Kursiv oder was)", TextType.TEXT)]
@@ -61,6 +61,7 @@ class TestTextNode(unittest.TestCase):
             TextNode("italic", TextType.ITALIC),
             TextNode("? Kursiv oder was)", TextType.TEXT)
         ]
+        self.assertEqual(new_nodes, expected_nodes)
 
     def test_extract_markdown_images(self):
         matches = extract_markdown_images("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)")
@@ -148,9 +149,19 @@ class TestTextNode(unittest.TestCase):
             new_nodes,
         )
         
-        
-        
-    
+    def test_text_to_textnodes(self):
+        text = "This is some **bold** text with a [link](https://www.example.com) and an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        text_nodes = text_to_textnodes(text)
+        expected_nodes = [
+            TextNode("This is some ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" text with a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://www.example.com"),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+        ]
+        self.assertListEqual(expected_nodes, text_nodes)
+
 
 if __name__ == "__main__":
     unittest.main()
