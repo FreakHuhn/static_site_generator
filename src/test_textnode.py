@@ -61,7 +61,22 @@ class TestTextNode(unittest.TestCase):
             TextNode("italic", TextType.ITALIC),
             TextNode("? Kursiv oder was)", TextType.TEXT)
         ]
-    
+
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)")
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches) 
+        
+    def test_extract_markdown_images2(self):
+        matches = extract_markdown_images("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![image2](https://i.imgur.com/zjjcJKZ.png)")
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png"), ("image2", "https://i.imgur.com/zjjcJKZ.png")], matches)
+        
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links("This is text with a [link](https://www.example.com)")
+        self.assertListEqual([("link", "https://www.example.com")], matches)
+        
+    def test_extract_markdown_links2(self):
+        matches = extract_markdown_links("This is text with a [link](https://www.example.com) and another [link2](https://www.example2.com)")
+        self.assertListEqual([("link", "https://www.example.com"), ("link2", "https://www.example2.com")], matches)   
 
 if __name__ == "__main__":
     unittest.main()
