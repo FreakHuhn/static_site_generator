@@ -1,7 +1,7 @@
 import re
 from textnode import *
 
-
+# split_nodes_delimiter teilt TextNodes durch ein bestimmten Delimiter
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for node in old_nodes:
@@ -26,6 +26,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 new_nodes.append(TextNode(part, text_type))
     return new_nodes
 
+# extract_markdown_images extrahiert alle Bilder aus einem Text und gibt eine Liste von (alt_text, url) zurück
 def extract_markdown_images(text):
     pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
     matches = re.findall(pattern, text)
@@ -34,6 +35,7 @@ def extract_markdown_images(text):
         images.append((alt_text, url))
     return images
 
+# extract_markdown_links extrahiert alle Links aus einem Text und gibt eine Liste von (anchor_text, url) zurück
 def extract_markdown_links(text):
     pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
     matches = re.findall(pattern, text)
@@ -42,6 +44,7 @@ def extract_markdown_links(text):
         links.append((anchor_text, url))
     return links
 
+# split_nodes_image teilt TextNodes durch Bilder und erstellt neue TextNodes für die Bilder
 def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
@@ -64,6 +67,7 @@ def split_nodes_image(old_nodes):
             new_nodes.append(TextNode(text, TextType.TEXT))
     return new_nodes
 
+# split_nodes_link teilt TextNodes durch Links und erstellt neue TextNodes für die Links
 def split_nodes_link(old_nodes):
     new_nodes = []
     for node in old_nodes:
@@ -86,6 +90,7 @@ def split_nodes_link(old_nodes):
             new_nodes.append(TextNode(text, TextType.TEXT))
     return new_nodes
 
+# text_to_textnodes nimmt einen Text und gibt eine Liste von TextNodes zurück, die den Text in verschiedene Texttypen aufteilen
 def text_to_textnodes(text):
     nodes = [TextNode(text, TextType.TEXT)]
     nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
@@ -95,11 +100,13 @@ def text_to_textnodes(text):
     nodes = split_nodes_image(nodes)
     return nodes
 
+# markdown_to_blocks teilt einen Markdown-Text in Blöcke auf, die durch doppelte Zeilenumbrüche getrennt sind, und entfernt führende und folgende Leerzeichen
 def markdown_to_blocks(markdown):
     blocks = markdown.split("\n\n")
     blocks = [block.strip() for block in blocks if block.strip()]
     return blocks
 
+# block_to_block_type nimmt einen Block und gibt den entsprechenden BlockType zurück, basierend auf den Markdown-Syntax-Regeln
 def block_to_block_type(block):
     if re.findall(r"^#{1,6} ", block):
         return BlockType.HEADING
