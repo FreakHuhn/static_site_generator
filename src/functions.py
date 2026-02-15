@@ -1,5 +1,6 @@
 import re
 from textnode import *
+from htmlnode import *
 
 # split_nodes_delimiter teilt TextNodes durch ein bestimmten Delimiter
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -119,3 +120,57 @@ def block_to_block_type(block):
     if re.findall(r"^```", block):
         return BlockType.CODE
     return BlockType.PARAGRAPH
+
+# markdown_to_html_node nimmt einen Markdown-Text und gibt einen HtmlNode zurück, 
+# der die HTML-Struktur des Markdown-Texts repräsentiert
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    block_nodes = []
+    for block in blocks:
+        block_type = block_to_block_type(block)
+
+        if block_type == BlockType.HEADING:
+            level = len(re.findall(r"^#{1,6}", block)[0])
+            text = re.sub(r"^#{1,6} ", "", block)
+            block_node = ParentNode(tag=f"h{level}", children=text_to_children(text))
+
+        elif block_type == BlockType.QUOTE:
+            text = re.sub(r"^> ?", "", block, flags=re.MULTILINE)
+            text = text.replace("\n", " ")
+            block_node = ParentNode(tag="blockquote", children=text_to_children(text))
+
+        elif block_type == BlockType.UNORDERED_LIST:
+            items = re.findall(r"^(\*|-|\+) (.+)", block, re.MULTILINE)
+            item_nodes = [ParentNode(tag="li", children=text_to_children(item)) for _, item in items]
+            block_node = ParentNode(tag="ul", children=item_nodes)
+
+        elif block_type == BlockType.ORDERED_LIST:
+            items = re.findall(r"^\d+\. (.+)", block, re.MULTILINE)
+            item_nodes = [ParentNode(tag="li", children=text_to_children(item)) for item in items]
+            block_node = ParentNode(tag="ol", children=item_nodes)
+
+        elif block_type == BlockType.CODE:
+            if "\n" in block:
+                code_text = block.split("\n", 1)[1]
+            else:
+                code_text = ""
+            if code_text.endswith("\n```"):
+                code_text = code_text[:-3]
+            elif code_text.endswith("```"):
+                code_text = code_text[:-3]
+            code_node = text_node_to_html_node(TextNode(code_text, TextType.CODE))
+            block_node = ParentNode(tag="pre", children=[code_node])
+        else:  # BlockType.PARAGRAPH
+            text = block.replace("\n", " ")
+            block_node = ParentNode(tag="p", children=text_to_children(text))
+
+        block_nodes.append(block_node)
+
+    return ParentNode(tag="div", children=block_nodes)
+
+# text_to_children nimmt einen Text und gibt eine Liste von HtmlNodes zurück, 
+# die den Text in verschiedene Texttypen aufteilen und in HtmlNodes umwandeln
+def text_to_children(text):
+    text_nodes = text_to_textnodes(text)
+    return [text_node_to_html_node(node) for node in text_nodes]
+
