@@ -1,6 +1,8 @@
 import re
 from textnode import *
 from htmlnode import *
+import os
+import shutil
 
 # split_nodes_delimiter teilt TextNodes durch ein bestimmten Delimiter
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -174,3 +176,19 @@ def text_to_children(text):
     text_nodes = text_to_textnodes(text)
     return [text_node_to_html_node(node) for node in text_nodes]
 
+# copy_directory kopiert alle Dateien und Unterverzeichnisse von src nach dst, wobei dst vorher gelöscht wird, wenn es bereits existiert
+def copy_directory(src, dst):
+    if os.path.exists(dst):
+        shutil.rmtree(dst)
+    os.mkdir(dst)
+
+    for item in os.listdir(src):
+        src_item = os.path.join(src, item)
+        dst_item = os.path.join(dst, item)
+
+        if os.path.isfile(src_item):
+            shutil.copy(src_item, dst_item)
+            print(f"Copied file: {src_item} to {dst_item}")
+        elif os.path.isdir(src_item):
+            copy_directory(src_item, dst_item)
+            print(f"Copied directory: {src_item} to {dst_item}")
