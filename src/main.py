@@ -8,6 +8,8 @@ def main():
     src = "static"
     dst = "public"
     copy_directory(src, dst)
+    generate_page("content/index.md", "public/index.html")
+    
 
 if __name__ == "__main__":
     main()

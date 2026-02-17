@@ -39,10 +39,13 @@ class LeafNode(HtmlNode):
     
     
     def to_html(self):
-        if not self.value:
+        if self.value is None:
             raise ValueError("LeafNode must have a value")
         if not self.tag:
             return self.value
+        # Self-closing tags wie img
+        if self.tag == "img":
+            return f"<{self.tag}{self.props_to_html()}>"  
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
     
 class ParentNode(HtmlNode):

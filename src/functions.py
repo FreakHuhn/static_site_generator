@@ -24,9 +24,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         parts = node.text.split(delimiter)
         for i, part in enumerate(parts):
             if i % 2 == 0:
-                new_nodes.append(TextNode(part, TextType.TEXT))
+                if part:  # Nur hinzufügen wenn nicht leer
+                    new_nodes.append(TextNode(part, TextType.TEXT))
             else:
-                new_nodes.append(TextNode(part, text_type))
+                if part:  # Nur hinzufügen wenn nicht leer
+                    new_nodes.append(TextNode(part, text_type))
     return new_nodes
 
 # extract_markdown_images extrahiert alle Bilder aus einem Text und gibt eine Liste von (alt_text, url) zurück
@@ -63,7 +65,8 @@ def split_nodes_image(old_nodes):
             image_markdown = f"![{alt_text}]({url})"
             if image_markdown in text:
                 parts = text.split(image_markdown)
-                new_nodes.append(TextNode(parts[0], TextType.TEXT))
+                if parts[0]:  # Nur hinzufügen wenn nicht leer
+                    new_nodes.append(TextNode(parts[0], TextType.TEXT))
                 new_nodes.append(TextNode(alt_text, TextType.IMAGE, url=url))
                 text = parts[1]
         if text:
@@ -86,7 +89,8 @@ def split_nodes_link(old_nodes):
             link_markdown = f"[{anchor_text}]({url})"
             if link_markdown in text:
                 parts = text.split(link_markdown)
-                new_nodes.append(TextNode(parts[0], TextType.TEXT))
+                if parts[0]:  # Nur hinzufügen wenn nicht leer
+                    new_nodes.append(TextNode(parts[0], TextType.TEXT))
                 new_nodes.append(TextNode(anchor_text, TextType.LINK, url=url))
                 text = parts[1]
         if text:
@@ -199,3 +203,26 @@ def extract_title(markdown):
     if match:
         return match.group(1).strip()
     raise Exception("No title found in markdown")
+
+# generate_page() generiert eine HTML-Seite aus einem Markdown-Text, indem es den Markdown-Text in HTML umwandelt, ein Template verwendet und die resultierende HTML-Datei speichert
+def generate_page(from_path, to_path):
+    print(f"Generating page from {from_path} to {to_path}")
+    
+    with open(from_path, "r", encoding="utf-8") as f: #<-- War sowas von auf KI angewiesen um das hinzubekommen.
+        markdown_content = f.read()                   #    I might be cooked as a developer.
+    
+    template_path = "template.html"
+    with open(template_path, "r", encoding="utf-8") as f: # hier drunter erklärt sich ja wenigstens manches von selbst...
+        template_content = f.read()                       #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    
+    html_node = markdown_to_html_node(markdown_content)
+    html_content = html_node.to_html()
+    
+    title = extract_title(markdown_content)
+    
+    full_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
+    
+    os.makedirs(os.path.dirname(to_path), exist_ok=True)
+    
+    with open(to_path, "w", encoding="utf-8") as f:  #<-- Und hiermit wird die generierte HTML-Seite tatsächlich gespeichert.
+        f.write(full_html)                           #    wenigstens ein hilfreicher Kommentar.
