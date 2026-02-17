@@ -192,3 +192,10 @@ def copy_directory(src, dst):
         elif os.path.isdir(src_item):
             copy_directory(src_item, dst_item)
             print(f"Copied directory: {src_item} to {dst_item}")
+
+# extract_title() extrahiert den h1 Header (beginnend mit einem einzelnen #) aus einem Markdown-Text und gibt ihn zurück.
+def extract_title(markdown):
+    match = re.search(r"^# (.+)$", markdown, re.MULTILINE)
+    if match:
+        return match.group(1).strip()
+    raise Exception("No title found in markdown")

@@ -218,3 +218,24 @@ the **same** even with inline stuff
         html,
         "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
     )
+        
+    def test_extract_title(self):
+        md = """# This is the title
+This is some text in a paragraph.
+"""
+        title = extract_title(md)
+        self.assertEqual(title, "This is the title")
+        
+    def test_extract_title_no_title(self):
+        md = """This is some text in a paragraph without a title"""
+        with self.assertRaises(Exception) as context:
+            extract_title(md)
+        self.assertTrue("No title found in markdown" in str(context.exception))
+        
+    def test_extract_title_multiple_titles(self):
+        md = """# This is the title
+        ## This is a subtitle
+        # This is another title
+        """
+        title = extract_title(md)
+        self.assertEqual(title, "This is the title")    
