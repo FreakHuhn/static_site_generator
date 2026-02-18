@@ -1,8 +1,13 @@
 import re
+import sys
 from textnode import *
 from htmlnode import *
 import os
 import shutil
+
+    
+
+basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
 
 # split_nodes_delimiter teilt TextNodes durch ein bestimmten Delimiter
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -205,7 +210,7 @@ def extract_title(markdown):
     raise Exception("No title found in markdown")
 
 # generate_page() generiert eine HTML-Seite aus einem Markdown-Text, indem es den Markdown-Text in HTML umwandelt, ein Template verwendet und die resultierende HTML-Datei speichert
-def generate_page(from_path, to_path):
+def generate_page(from_path, to_path, basepath):
     print(f"Generating page from {from_path} to {to_path}")
     
     with open(from_path, "r", encoding="utf-8") as f: #<-- War sowas von auf KI angewiesen um das hinzubekommen.
@@ -221,6 +226,7 @@ def generate_page(from_path, to_path):
     title = extract_title(markdown_content)
     
     full_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
+    full_html = full_html.replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
     
     os.makedirs(os.path.dirname(to_path), exist_ok=True)
     
@@ -229,7 +235,7 @@ def generate_page(from_path, to_path):
         
 # generate_pages_recursive() durchläuft rekursiv alle Dateien in einem Verzeichnis,
 # generiert für jede Markdown-Datei eine HTML-Seite und speichert sie im entsprechenden Zielverzeichnis, wobei die Verzeichnisstruktur beibehalten wird.
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for root, dirs, files in os.walk(dir_path_content):    #<-- os.walk() ist eine Funktion, die es ermöglicht,
                                                            #    durch alle Verzeichnisse und Dateien in einem angegebenen Verzeichnis zu iterieren.
         for file in files:                                 #<-- Hier wird jede Datei in der aktuellen Verzeichnisebene überprüft.           
@@ -237,4 +243,4 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 from_path = os.path.join(root, file)
                 relative_path = os.path.relpath(from_path, dir_path_content)
                 to_path = os.path.join(dest_dir_path, relative_path[:-3] + ".html")
-                generate_page(from_path, to_path)
+                generate_page(from_path, to_path, basepath)
