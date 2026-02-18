@@ -226,3 +226,15 @@ def generate_page(from_path, to_path):
     
     with open(to_path, "w", encoding="utf-8") as f:  #<-- Und hiermit wird die generierte HTML-Seite tatsächlich gespeichert.
         f.write(full_html)                           #    wenigstens ein hilfreicher Kommentar.
+        
+# generate_pages_recursive() durchläuft rekursiv alle Dateien in einem Verzeichnis,
+# generiert für jede Markdown-Datei eine HTML-Seite und speichert sie im entsprechenden Zielverzeichnis, wobei die Verzeichnisstruktur beibehalten wird.
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for root, dirs, files in os.walk(dir_path_content):    #<-- os.walk() ist eine Funktion, die es ermöglicht,
+                                                           #    durch alle Verzeichnisse und Dateien in einem angegebenen Verzeichnis zu iterieren.
+        for file in files:                                 #<-- Hier wird jede Datei in der aktuellen Verzeichnisebene überprüft.           
+            if file.endswith(".md"):                       #<-- Es werden nur Dateien mit der Endung ".md" berücksichtigt.
+                from_path = os.path.join(root, file)
+                relative_path = os.path.relpath(from_path, dir_path_content)
+                to_path = os.path.join(dest_dir_path, relative_path[:-3] + ".html")
+                generate_page(from_path, to_path)
